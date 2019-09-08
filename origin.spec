@@ -7,8 +7,8 @@
 %global import_path github.com/openshift/origin
 
 %global golang_version 1.12
-# %commit and %os_git_vars are intended to be set by tito custom builders provided
-# in the .tito/lib directory. The values in this spec file will not be kept up to date.
+# commit and os_git_vars are intended to be set by the build system.
+# NOTE: The values in this spec file will not be kept up to date.
 %{!?commit:
 %global commit 86b5e46426ba828f49195af21c56f7c6674b48f7
 }
@@ -46,15 +46,15 @@
 %endif
 %{!?make_redistributable: %global make_redistributable %{need_redistributable_set}}
 
-%if "%{dist}" == ".el7aos"
+%if 0%{?ose_build}
 %global package_name openshift
 %global product_name OpenShift
 %else
-%global package_name openshift
-%global product_name OpenShift
+%global package_name okd
+%global product_name OKD
 %endif
 
-%{!?version: %global version 0.0.1}
+%{!?version: %global version 4.0.0}
 %{!?release: %global release 1}
 
 Name:           %{package_name}
@@ -78,6 +78,7 @@ BuildRequires:  golang >= %{golang_version}
 BuildRequires:  krb5-devel
 BuildRequires:  rsync
 
+# TODO: Add alternative to tito here to gather and inject Bundled Provides into specfile.
 #
 # The following Bundled Provides entries are populated automatically by the
 # OpenShift tito custom builder found here:
@@ -102,9 +103,14 @@ Summary:        %{product_name} Kubernetes server commands
 Requires:       util-linux
 Requires:       socat
 Requires:       iptables
-Provides:       hyperkube
-Provides:       atomic-openshift-hyperkube
-Provides:       atomic-openshift-node
+Provides:       hyperkube = %{version}
+Provides:       atomic-openshift-hyperkube = %{version}
+Provides:       atomic-openshift-node = %{version}
+%if 0%{?ose_build}
+Conflicts:      okd-hyperkube
+%else
+Conflicts:      openshift-hyperkube
+%endif
 
 %description hyperkube
 %{summary}

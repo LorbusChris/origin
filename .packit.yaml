@@ -1,0 +1,23 @@
+---
+specfile_path: origin.spec
+synced_files:
+  - origin.spec
+  - .packit.yaml
+git upstream_ref: master
+upstream_project_name: okd
+downstream_package_name: okd
+jobs:
+- job: copr_build
+  trigger: pull_request
+  metadata:
+    targets:
+      - fedora-rawhide-x86_64
+      - fedora-31-x86_64
+      - fedora-30-x86_64
+- job: copr_build
+  trigger: release
+  metadata:
+    targets:
+      - fedora-rawhide-x86_64
+      - fedora-31-x86_64
+      - fedora-30-x86_64
